@@ -19,8 +19,8 @@ class NodeTest {
     @DisplayName("addSensorReading() should correctly add a sensor reading to the list of sensor readings")
     void add_sensor_reading_should_correctly_add_a_sensor_reading_to_the_list_of_sensor_readings() {
         SensorReading reading = SensorReading.builder().build();
-        assertTrue(n.addSensorReading(reading));
-        assertEquals(n.getSensorReadings().size(), 1);
+        assertTrue(n.addSensorReadingId(reading.getId()));
+        assertEquals(n.getSensorReadingIds().size(), 1);
     }
 
     @Test
@@ -31,7 +31,7 @@ class NodeTest {
                 .humidity(1.5f)
                 .temperature(35.2f)
                 .id("test-id").build();
-        n.addSensorReading(reading);
-        assertEquals(reading,n.getSensorReadings().getFirst());
+        n.addSensorReadingId(reading.getId());
+        assertEquals(reading.getId(),n.getSensorReadingIds().getFirst());
     }
 }

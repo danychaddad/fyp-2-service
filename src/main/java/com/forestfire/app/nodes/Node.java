@@ -1,6 +1,5 @@
 package com.forestfire.app.nodes;
 
-import com.forestfire.app.sensors.SensorReading;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -17,9 +16,9 @@ public class Node {
     private float longitude;
     private float latitude;
     @Builder.Default
-    private List<SensorReading> sensorReadings = new ArrayList<>();
+    private List<String> sensorReadingIds = new ArrayList<>();
 
-    public boolean addSensorReading(SensorReading reading) {
-        return sensorReadings.add(reading);
+    public boolean addSensorReadingId(String readingId) {
+        return sensorReadingIds.add(readingId);
     }
 }
