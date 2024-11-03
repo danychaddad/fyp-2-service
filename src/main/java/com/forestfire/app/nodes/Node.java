@@ -13,6 +13,7 @@ public class Node {
     @Id
     private String id;
 
+    private String macAddress;
     private float longitude;
     private float latitude;
     @Builder.Default
