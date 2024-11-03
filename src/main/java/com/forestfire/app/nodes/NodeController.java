@@ -1,6 +1,7 @@
 package com.forestfire.app.nodes;
 
 import com.forestfire.app.nodes.requests.NodeHelloRequest;
+import com.forestfire.app.nodes.requests.NodeSensorReadingRequest;
 import com.forestfire.app.sensors.SensorReading;
 import com.forestfire.app.sensors.SensorReadingRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class NodeController {
         return nodeRepository.findAll();
     }
 
+    // TODO: check if the node already exists in the DB. if so, get the ID from the DB, otherwise generate a new one.
     @PostMapping("/hello")
     public ResponseEntity<Node> hello(@RequestBody NodeHelloRequest req) {
         log.info("Adding node with MAC: {} to the list", req.getMacAddress());
@@ -42,7 +44,9 @@ public class NodeController {
     }
 
     @PostMapping("/{nodeId}")
-    public ResponseEntity<SensorReading> addNewSensorReading(@PathVariable("nodeId") String nodeId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(SensorReading.builder().build());
+    public ResponseEntity<SensorReading> addNewSensorReading(@PathVariable("nodeId") String nodeId,
+                                                             @RequestBody NodeSensorReadingRequest request) {
+        SensorReading reading = request.getReading();
+        return ResponseEntity.status(HttpStatus.CREATED).body(reading);
     }
 }

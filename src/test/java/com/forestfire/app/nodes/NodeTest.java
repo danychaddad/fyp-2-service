@@ -29,8 +29,7 @@ class NodeTest {
         SensorReading reading = SensorReading.builder()
                 .gasSensorReading(1.2f)
                 .humidity(1.5f)
-                .temperature(35.2f)
-                .id("test-id").build();
+                .temperature(35.2f).build();
         n.addSensorReadingId(reading.getId());
         assertEquals(reading.getId(),n.getSensorReadingIds().getFirst());
     }

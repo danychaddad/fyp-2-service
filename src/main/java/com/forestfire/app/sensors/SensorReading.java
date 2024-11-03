@@ -6,7 +6,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Builder
 @Document("sensor_readings")
 public class SensorReading {
     @Id
@@ -15,4 +14,11 @@ public class SensorReading {
     private float temperature;
     private float humidity;
     private float gasSensorReading;
+
+    @Builder
+    public SensorReading(float temperature, float humidity, float gasSensorReading) {
+        this.temperature = temperature;
+        this.humidity = humidity;
+        this.gasSensorReading = gasSensorReading;
+    }
 }

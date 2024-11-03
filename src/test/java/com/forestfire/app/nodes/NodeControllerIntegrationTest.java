@@ -1,6 +1,9 @@
 package com.forestfire.app.nodes;
 
 import com.forestfire.app.nodes.requests.NodeHelloRequest;
+import com.forestfire.app.nodes.requests.NodeSensorReadingRequest;
+import com.forestfire.app.sensors.SensorReading;
+import com.forestfire.app.sensors.SensorReadingRepository;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,8 +34,13 @@ class NodeControllerIntegrationTest {
     @MockBean
     private NodeRepository nodeRepository;
 
+    @MockBean
+    private SensorReadingRepository sensorReadingRepository;
+
     @Autowired
     private MockMvc mockMvc;
+
+    private final Gson gson = new Gson();
 
     @BeforeEach
     void setUp() {
@@ -74,8 +82,6 @@ class NodeControllerIntegrationTest {
     void a_get_request_after_a_post_request_should_correctly_return_the_new_node() throws Exception {
         List<Node> nodeStore = new ArrayList<>();
         when(nodeRepository.findAll()).thenAnswer(invocation -> new ArrayList<>(nodeStore));
-
-        Gson gson = new Gson();
         String macAddress = "12:34:56:78:9A:BC";
 
         mockMvc.perform(get("/nodes/all"))
@@ -105,8 +111,20 @@ class NodeControllerIntegrationTest {
     @Test
     @DisplayName("A POST request to /nodes/{nodeId} should add a new reading to the database and to the list of readings")
     void a_post_request_to_nodes_node_id_should_add_a_new_reading_to_the_database_and_to_the_list_of_readings() throws Exception {
-//        mockMvc.perform(post)
-        mockMvc.perform(post("/nodes/test-id"))
+        SensorReading sensorReading = SensorReading.builder()
+                .temperature(31.5f)
+                .humidity(60.5f)
+                .gasSensorReading(12.5f)
+                .build();
+        NodeSensorReadingRequest sensorReadingRequest = NodeSensorReadingRequest.builder()
+                .reading(sensorReading)
+                .nodeId("test-id").build();
+        mockMvc.perform(post("/nodes/test-id")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(gson.toJson(sensorReadingRequest)))
+                .andExpect(jsonPath("$.temperature").value(31.5))
+                .andExpect(jsonPath("$.humidity").value(60.5))
+                .andExpect(jsonPath("$.gasSensorReading").value(12.5))
                 .andExpect(status().isCreated());
     }
 }
