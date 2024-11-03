@@ -51,15 +51,21 @@ class NodeControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("A POST request to /nodes/hello should initialize a node")
+    @DisplayName("A POST request to /nodes/hello should initialize a node with the correct parameters")
     void a_post_request_to_nodes_hello_should_initialize_a_node() throws Exception {
         Gson gson = new Gson();
         String macAddress = "12:34:56:78:9A:BC";
-        String requestBody = gson.toJson(NodeHelloRequest.builder().macAddress(macAddress).build());
+        String requestBody = gson.toJson(NodeHelloRequest.builder()
+                .macAddress(macAddress)
+                .latitude(1f)
+                .longitude(2f)
+                .build());
         System.out.println(requestBody);
         mockMvc.perform(post("/nodes/hello")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
+                .andExpect(jsonPath("$.latitude").value(1.0))
+                .andExpect(jsonPath("$.longitude").value(2.0))
                 .andExpect(status().isCreated());
     }
 
@@ -96,4 +102,11 @@ class NodeControllerIntegrationTest {
                 .andExpect(jsonPath("$[0].macAddress").value(macAddress));
     }
 
+    @Test
+    @DisplayName("A POST request to /nodes/{nodeId} should add a new reading to the database and to the list of readings")
+    void a_post_request_to_nodes_node_id_should_add_a_new_reading_to_the_database_and_to_the_list_of_readings() throws Exception {
+//        mockMvc.perform(post)
+        mockMvc.perform(post("/nodes/test-id"))
+                .andExpect(status().isCreated());
+    }
 }
