@@ -1,13 +1,11 @@
-name: Java CI/CD with Maven
+name: Java CI with Maven
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
 jobs:
-  build-and-deploy:  # Job ID
+  build:  # Job ID
     name: Java CI/CD with Maven  # Name of the job
     runs-on: ubuntu-latest
 
@@ -26,21 +24,3 @@ jobs:
       # Build and run tests
       - name: Build with Maven and run tests
         run: mvn -B clean verify
-
-      # Package the application
-      - name: Package with Maven
-        run: mvn package -DskipTests
-
-      # Add SSH key to the SSH agent for secure access
-      - name: Add SSH key
-        uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.PRIVATE_KEY }}  # Add your PEM file as a GitHub secret
-
-      # Transfer the JAR file to the AWS EC2 instance
-      - name: Transfer JAR to EC2
-        run: scp -o StrictHostKeyChecking=no target/*.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app.jar
-
-      # Run the application on the EC2 instance
-      - name: Run Application on EC2
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'nohup java -jar /home/${{ secrets.EC2_USER }}/app.jar > /home/${{ secrets.EC2_USER }}/app.log 2>&1 &'
