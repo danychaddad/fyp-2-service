@@ -16,10 +16,10 @@ jobs:
       - uses: actions/checkout@v4
 
       # Set up JDK 17 environment
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'  # Update if using JDK 17 instead of 21
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
 
