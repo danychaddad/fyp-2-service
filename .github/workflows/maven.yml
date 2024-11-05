@@ -57,6 +57,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.PRIVATE_KEY }}
 
+      # Kill any running Java processes on EC2
+      - name: Kill Running Java Processes
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'pkill -f java || echo "No Java process running"'
+
       # Transfer the JAR file to EC2
       - name: Transfer JAR to EC2
         run: scp -o StrictHostKeyChecking=no target/*.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app.jar
