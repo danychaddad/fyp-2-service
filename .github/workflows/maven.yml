@@ -30,7 +30,7 @@ jobs:
         run: mvn -B clean verify
 
   # Job for the 'main' branch - Deploys the app
-    deploy:
+  deploy:
     name: Deploy to AWS EC2
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'  # Runs only when changes are pushed to the 'main' branch
@@ -75,4 +75,3 @@ jobs:
           export MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }}
           nohup java -jar /home/${{ secrets.EC2_USER }}/app.jar > /home/${{ secrets.EC2_USER }}/app.log 2>&1 &
           EOF
-
