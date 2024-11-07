@@ -30,7 +30,7 @@ jobs:
         run: mvn -B clean verify
 
   # Job for the 'main' branch - Deploys the app
-  deploy:
+    deploy:
     name: Deploy to AWS EC2
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'  # Runs only when changes are pushed to the 'main' branch
@@ -57,6 +57,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.PRIVATE_KEY }}
 
+      # Kill any existing Java processes on EC2
+      - name: Stop existing Java processes
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'pkill -f java || true'
+
       # Transfer the JAR file to EC2
       - name: Transfer JAR to EC2
         run: scp -o StrictHostKeyChecking=no target/*.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app.jar
@@ -70,3 +75,4 @@ jobs:
           export MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }}
           nohup java -jar /home/${{ secrets.EC2_USER }}/app.jar > /home/${{ secrets.EC2_USER }}/app.log 2>&1 &
           EOF
+
