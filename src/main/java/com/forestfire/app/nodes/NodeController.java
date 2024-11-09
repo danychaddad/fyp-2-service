@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -20,12 +19,10 @@ import java.util.Optional;
 public class NodeController {
 
     private final NodeRepository nodeRepository;
-    private final SensorReadingRepository sensorReadingRepository;
 
     @Autowired
     public NodeController(NodeRepository nodeRepository, SensorReadingRepository sensorReadingRepository) {
         this.nodeRepository = nodeRepository;
-        this.sensorReadingRepository = sensorReadingRepository;
     }
 
     @GetMapping("/all")
@@ -33,6 +30,7 @@ public class NodeController {
         return nodeRepository.findAll();
     }
 
+    // TODO: Add get neighbors logic
     @PostMapping("/hello")
     public ResponseEntity<Node> hello(@RequestBody NodeHelloRequest req) {
         Optional<Node> existingNode = nodeRepository.findById(req.getMacAddress());
@@ -53,6 +51,12 @@ public class NodeController {
         nodeRepository.save(newNode);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(newNode);
+    }
+
+    @GetMapping("/{nodeId}")
+    public ResponseEntity<Node> getSensorById(@PathVariable("nodeId") String nodeId) {
+        Optional<Node> node = nodeRepository.findById(nodeId);
+        return node.map(value -> ResponseEntity.status(HttpStatus.OK).body(value)).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
 
