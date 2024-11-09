@@ -173,24 +173,4 @@ class NodeControllerIntegrationTest {
         mockMvc.perform(get("/nodes/test-id"))
                 .andExpect(status().isNotFound());
     }
-
-    @Test
-    @DisplayName("A POST request to /nodes/{nodeId} should add a new reading to the database and to the list of readings")
-    void a_post_request_to_nodes_node_id_should_add_a_new_reading_to_the_database_and_to_the_list_of_readings() throws Exception {
-        SensorReading sensorReading = SensorReading.builder()
-                .temperature(31.5f)
-                .humidity(60.5f)
-                .gasSensorReading(12.5f)
-                .build();
-        NodeSensorReadingRequest sensorReadingRequest = NodeSensorReadingRequest.builder()
-                .reading(sensorReading)
-                .nodeId("test-id").build();
-        mockMvc.perform(post("/nodes/test-id")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson.toJson(sensorReadingRequest)))
-                .andExpect(jsonPath("$.temperature").value(31.5))
-                .andExpect(jsonPath("$.humidity").value(60.5))
-                .andExpect(jsonPath("$.gasSensorReading").value(12.5))
-                .andExpect(status().isCreated());
-    }
 }

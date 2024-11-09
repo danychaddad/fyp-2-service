@@ -58,12 +58,4 @@ public class NodeController {
         Optional<Node> node = nodeRepository.findById(nodeId);
         return node.map(value -> ResponseEntity.status(HttpStatus.OK).body(value)).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
-
-
-    @PostMapping("/{nodeId}")
-    public ResponseEntity<SensorReading> addNewSensorReading(@PathVariable("nodeId") String nodeId,
-                                                             @RequestBody NodeSensorReadingRequest request) {
-        SensorReading reading = request.getReading();
-        return ResponseEntity.status(HttpStatus.CREATED).body(reading);
-    }
 }
