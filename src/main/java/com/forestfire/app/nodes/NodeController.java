@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/nodes")
@@ -31,17 +33,28 @@ public class NodeController {
         return nodeRepository.findAll();
     }
 
-    // TODO: check if the node already exists in the DB. if so, get the ID from the DB, otherwise generate a new one.
     @PostMapping("/hello")
     public ResponseEntity<Node> hello(@RequestBody NodeHelloRequest req) {
-        log.info("Adding node with MAC: {} to the list", req.getMacAddress());
-        Node n = Node.builder().macAddress(req.getMacAddress())
+        Optional<Node> existingNode = nodeRepository.findById(req.getMacAddress());
+
+        if (existingNode.isPresent()) {
+            log.info("Node with MAC: {} already exists, returning existing node.", req.getMacAddress());
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(existingNode.get());
+        }
+
+        log.info("Adding node with MAC: {}, longitude: {}, latitude: {}, to the list",
+                req.getMacAddress(), req.getLongitude(), req.getLatitude());
+
+        Node newNode = Node.builder()
+                .macAddress(req.getMacAddress())
                 .latitude(req.getLatitude())
                 .longitude(req.getLongitude())
                 .build();
-        nodeRepository.save(n);
-        return ResponseEntity.status(HttpStatus.CREATED).body(n);
+        nodeRepository.save(newNode);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(newNode);
     }
+
 
     @PostMapping("/{nodeId}")
     public ResponseEntity<SensorReading> addNewSensorReading(@PathVariable("nodeId") String nodeId,

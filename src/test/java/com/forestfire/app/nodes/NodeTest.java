@@ -12,7 +12,7 @@ class NodeTest {
 
     @BeforeEach
     void setup() {
-        n = Node.builder().id("test-id").latitude(123f).longitude(123f).build();
+        n = Node.builder().macAddress("test-id").latitude(123f).longitude(123f).build();
     }
 
     @Test

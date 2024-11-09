@@ -9,11 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,12 +52,12 @@ class NodeControllerIntegrationTest {
     @Test
     @DisplayName("An API call to /nodes/all should return all nodes")
     void an_api_call_to_nodes_all_should_return_all_nodes() throws Exception {
-        Node n = Node.builder().id("test-id").build();
+        Node n = Node.builder().macAddress("test-id").build();
         when(nodeRepository.findAll()).thenReturn(List.of(n));
         mockMvc.perform(get("/nodes/all"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value("test-id"));
+                .andExpect(jsonPath("$[0].macAddress").value("test-id"));
     }
 
     @Test
@@ -83,20 +85,22 @@ class NodeControllerIntegrationTest {
         List<Node> nodeStore = new ArrayList<>();
         when(nodeRepository.findAll()).thenAnswer(invocation -> new ArrayList<>(nodeStore));
         String macAddress = "12:34:56:78:9A:BC";
+        float longitude = 1.5f;
 
         mockMvc.perform(get("/nodes/all"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
 
-        Node n = Node.builder().macAddress(macAddress).build();
+        Node n = Node.builder().macAddress(macAddress).longitude(longitude).build();
         when(nodeRepository.save(any(Node.class))).thenAnswer(invocation -> {
-            nodeStore.add(n);
-            return n;
+            Node node = invocation.getArgument(0);
+            nodeStore.add(node);
+            return node;
         });
 
         mockMvc.perform(post("/nodes/hello")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson.toJson(NodeHelloRequest.builder().macAddress(macAddress).build())))
+                        .content(gson.toJson(NodeHelloRequest.builder().macAddress(macAddress).longitude(longitude).build())))
                 .andExpect(status().isCreated());
 
         when(nodeRepository.findAll()).thenAnswer(invocation -> new ArrayList<>(nodeStore));
@@ -105,7 +109,54 @@ class NodeControllerIntegrationTest {
         mockMvc.perform(get("/nodes/all"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].macAddress").value(macAddress));
+                .andExpect(jsonPath("$[0].macAddress").value(macAddress))
+                .andExpect(jsonPath("$[0].longitude").value(longitude));
+    }
+
+    @Test
+    @DisplayName("A POST request to /nodes/hello should return the existing node if it already exists in the DB")
+    void a_post_request_to_nodes_hello_should_return_the_existing_node_if_it_already_exists_in_the_db() throws Exception {
+        List<Node> nodeStore = new ArrayList<>();
+        String testedMacAddress = "test-mac";
+        float testedLongitude = 1f;
+        float expectedLatitude = 2f;
+        NodeHelloRequest req1 = NodeHelloRequest.builder()
+                .macAddress(testedMacAddress)
+                .longitude(testedLongitude)
+                .latitude(expectedLatitude).build();
+        NodeHelloRequest req2 = NodeHelloRequest.builder()
+                .macAddress(testedMacAddress)
+                .longitude(testedLongitude)
+                .latitude(3).build();
+
+        when(nodeRepository.save(any(Node.class))).thenAnswer(invocation -> {
+            Node node = invocation.getArgument(0);
+            nodeStore.add(node);
+            return node;
+        });
+
+        when(nodeRepository.findAll()).thenAnswer(invocation -> new ArrayList<>(nodeStore));
+        when(nodeRepository.findById(any(String.class))).thenAnswer(invocation -> {
+            String wantedMac = invocation.getArgument(0);
+            return nodeStore.stream()
+                    .filter(node -> node.getMacAddress().equals(wantedMac))
+                    .findFirst(); // This returns an Optional<Node>
+        });
+
+
+        mockMvc.perform(post("/nodes/hello").contentType(MediaType.APPLICATION_JSON)
+                        .content(gson.toJson(req1)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.macAddress").value(testedMacAddress))
+                .andExpect(jsonPath("$.longitude").value(testedLongitude))
+                .andExpect(jsonPath("$.latitude").value(expectedLatitude));
+
+        mockMvc.perform(post("/nodes/hello").contentType(MediaType.APPLICATION_JSON)
+                        .content(gson.toJson(req2)))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.macAddress").value(testedMacAddress))
+                .andExpect(jsonPath("$.longitude").value(testedLongitude))
+                .andExpect(jsonPath("$.latitude").value(expectedLatitude));
     }
 
     @Test
