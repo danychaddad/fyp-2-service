@@ -25,7 +25,7 @@ public class NodeController {
         this.nodeRepository = nodeRepository;
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public List<Node> all() {
         return nodeRepository.findAll();
     }

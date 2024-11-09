@@ -1,8 +1,6 @@
 package com.forestfire.app.nodes;
 
 import com.forestfire.app.nodes.requests.NodeHelloRequest;
-import com.forestfire.app.nodes.requests.NodeSensorReadingRequest;
-import com.forestfire.app.sensors.SensorReading;
 import com.forestfire.app.sensors.SensorReadingRepository;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,11 +60,11 @@ class NodeControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("An API call to /nodes/all should return all nodes")
+    @DisplayName("An API call to /nodes should return all nodes")
     void an_api_call_to_nodes_all_should_return_all_nodes() throws Exception {
         Node n = Node.builder().macAddress("test-id").build();
         nodeRepository.save(n);
-        mockMvc.perform(get("/nodes/all"))
+        mockMvc.perform(get("/nodes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].macAddress").value("test-id"));
@@ -97,7 +95,7 @@ class NodeControllerIntegrationTest {
         String macAddress = "12:34:56:78:9A:BC";
         float longitude = 1.5f;
 
-        mockMvc.perform(get("/nodes/all"))
+        mockMvc.perform(get("/nodes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
 
@@ -108,7 +106,7 @@ class NodeControllerIntegrationTest {
                         .content(gson.toJson(NodeHelloRequest.builder().macAddress(macAddress).longitude(longitude).build())))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/nodes/all"))
+        mockMvc.perform(get("/nodes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].macAddress").value(macAddress))
