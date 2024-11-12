@@ -8,18 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Builder
 public class Node {
     @Id
-    private String id;
-
     private String macAddress;
     private float longitude;
     private float latitude;
-    @Builder.Default
-    private List<String> sensorReadingIds = new ArrayList<>();
 
-    public boolean addSensorReadingId(String readingId) {
-        return sensorReadingIds.add(readingId);
+    @Builder
+    public Node(float longitude, float latitude, String macAddress) {
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.macAddress = macAddress;
+    }
+
+    public String getId() {
+        return macAddress;
     }
 }

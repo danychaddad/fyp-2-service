@@ -58,9 +58,9 @@ public class ForestTest {
     @Test
     @DisplayName("updateNode() should correctly update a node in the list of nodes")
     void update_node_should_correctly_update_a_node_in_the_list_of_nodes() {
-        Node n = Node.builder().id("test-id").build();
+        Node n = Node.builder().macAddress("test-id").build();
         f.addNode(n);
-        Node updatedNode = Node.builder().id("test-id").build();
+        Node updatedNode = Node.builder().macAddress("test-id").build();
         assertTrue(f.updateNode(updatedNode));
         assertEquals(f.getNodesInForest().get(0).getId(), "test-id");
     }
@@ -68,7 +68,7 @@ public class ForestTest {
     @Test
     @DisplayName("removeNode() should correctly remove a node from the list of nodes")
     void remove_node_should_correctly_remove_a_node_from_the_list_of_nodes() {
-        Node n = Node.builder().id("test-id").build();
+        Node n = Node.builder().macAddress("test-id").build();
         f.addNode(n);
         assertTrue(f.removeNode(n));
         assertEquals(f.getNodesInForest().size(), 0);
