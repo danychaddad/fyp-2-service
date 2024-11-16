@@ -2,7 +2,6 @@ package com.forestfire.app.forests;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +24,6 @@ public class ForestController {
 
     private final ForestRepository forestRepository;
 
-    @Autowired
     public ForestController(ForestRepository forestRepository) {
         this.forestRepository = forestRepository;
     }

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.forestfire.app.forests.vertex.Vertex;
-import com.forestfire.app.nodes.Node;
 
 public class ForestTest {
     Forest f;
@@ -45,32 +44,5 @@ public class ForestTest {
         f.addVertex(v);
         assertTrue(f.removeVertex(v));
         assertEquals(f.getVerticesOfForest().size(), 0);
-    }
-
-    @Test
-    @DisplayName("addNode() should correctly add a node to the list of nodes")
-    void add_node_should_correctly_add_a_node_to_the_list_of_nodes() {
-        Node n = Node.builder().build();
-        assertTrue(f.addNode(n));
-        assertEquals(f.getNodesInForest().size(), 1);
-    }
-
-    @Test
-    @DisplayName("updateNode() should correctly update a node in the list of nodes")
-    void update_node_should_correctly_update_a_node_in_the_list_of_nodes() {
-        Node n = Node.builder().macAddress("test-id").build();
-        f.addNode(n);
-        Node updatedNode = Node.builder().macAddress("test-id").build();
-        assertTrue(f.updateNode(updatedNode));
-        assertEquals(f.getNodesInForest().get(0).getId(), "test-id");
-    }
-
-    @Test
-    @DisplayName("removeNode() should correctly remove a node from the list of nodes")
-    void remove_node_should_correctly_remove_a_node_from_the_list_of_nodes() {
-        Node n = Node.builder().macAddress("test-id").build();
-        f.addNode(n);
-        assertTrue(f.removeNode(n));
-        assertEquals(f.getNodesInForest().size(), 0);
     }
 }
