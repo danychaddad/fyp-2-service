@@ -49,6 +49,12 @@ public class NodeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newNode);
     }
 
+    @DeleteMapping("/nodes/{id}")
+    public ResponseEntity<String> deleteNode(@PathVariable String id) {
+        nodeRepository.deleteById(id);
+        return ResponseEntity.status(HttpStatus.OK).body("Deleted node with id: " + id);
+    }
+
     @GetMapping("/nodes/{nodeId}")
     public ResponseEntity<Node> getSensorById(@PathVariable("nodeId") String nodeId) {
         Optional<Node> node = nodeRepository.findById(nodeId);
