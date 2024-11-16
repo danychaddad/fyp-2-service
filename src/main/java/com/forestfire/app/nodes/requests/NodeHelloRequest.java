@@ -11,4 +11,5 @@ public class NodeHelloRequest implements Serializable {
     private String macAddress;
     private float longitude;
     private float latitude;
+    private String forestId;
 }
