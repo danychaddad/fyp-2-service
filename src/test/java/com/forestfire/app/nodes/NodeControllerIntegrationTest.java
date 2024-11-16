@@ -19,10 +19,13 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -209,5 +212,16 @@ class NodeControllerIntegrationTest {
                 String forestId = "non-existent-forest";
                 mockMvc.perform(get("/forests/" + forestId + "/nodes"))
                                 .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("DELETE /nodes/{id} should delete a node by ID")
+        void deleteNode_shouldDeleteNodeById() throws Exception {
+                String id = "test-id";
+                doNothing().when(nodeRepository).deleteById(id);
+
+                mockMvc.perform(delete("/nodes/{id}", id))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("Deleted node with id: " + id));
         }
 }

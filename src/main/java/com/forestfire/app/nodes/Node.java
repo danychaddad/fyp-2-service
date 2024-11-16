@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 public class Node {
     @Id
     private String macAddress;
+    
     private float longitude;
     private float latitude;
     private String forestId;
