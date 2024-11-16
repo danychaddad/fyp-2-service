@@ -42,6 +42,7 @@ public class NodeController {
                 .macAddress(req.getMacAddress())
                 .latitude(req.getLatitude())
                 .longitude(req.getLongitude())
+                .forestId(req.getForestId())
                 .build();
         nodeRepository.save(newNode);
 
