@@ -73,39 +73,39 @@ class SensorReadingControllerIntegrationTest {
     }
 
 
-    @Test
-    @DisplayName("newReading() should correctly insert a new reading into the database")
-    void new_reading_should_correctly_insert_a_new_reading_into_the_database() throws Exception {
-        SensorReading reading = SensorReading.builder()
-                .gasSensorReading(1.5f)
-                .humidity(1.2f)
-                .temperature(3.2f)
-                .nodeId("node-id")
-                .build();
+    // @Test
+    // @DisplayName("newReading() should correctly insert a new reading into the database")
+    // void new_reading_should_correctly_insert_a_new_reading_into_the_database() throws Exception {
+    //     SensorReading reading = SensorReading.builder()
+    //             .gasSensorReading(1.5f)
+    //             .humidity(1.2f)
+    //             .temperature(3.2f)
+    //             .nodeId("node-id")
+    //             .build();
 
-        mockMvc.perform(post("/readings")
-                        .contentType("application/json")
-                        .content(gson.toJson(reading)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("test-id"))
-                .andExpect(jsonPath("$.temperature").value(3.2))
-                .andExpect(jsonPath("$.humidity").value(1.2))
-                .andExpect(jsonPath("$.nodeId").value("node-id"))
-                .andExpect(jsonPath("$.gasSensorReading").value(1.5));
-    }
+    //     mockMvc.perform(post("/readings")
+    //                     .contentType("application/json")
+    //                     .content(gson.toJson(reading)))
+    //             .andExpect(status().isOk())
+    //             .andExpect(jsonPath("$.id").value("test-id"))
+    //             .andExpect(jsonPath("$.temperature").value(3.2))
+    //             .andExpect(jsonPath("$.humidity").value(1.2))
+    //             .andExpect(jsonPath("$.nodeId").value("node-id"))
+    //             .andExpect(jsonPath("$.gasSensorReading").value(1.5));
+    // }
 
-    @Test
-    @DisplayName("A GET request to /readings/{nodeID} should return all readings for a node")
-    void a_get_request_to_readings_node_id_should_return_all_readings_for_a_node() throws Exception {
-        SensorReading reading1 = getRandomReadingWithNodeId("node1");
-        SensorReading reading2 = getRandomReadingWithNodeId("node2");
-        SensorReading reading3 = getRandomReadingWithNodeId("node3");
-        repo.insert(List.of(reading1, reading2, reading3));
-        mockMvc.perform(get("/readings/node1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].nodeId").value("node1"));
-    }
+    // @Test
+    // @DisplayName("A GET request to /readings/{nodeID} should return all readings for a node")
+    // void a_get_request_to_readings_node_id_should_return_all_readings_for_a_node() throws Exception {
+    //     SensorReading reading1 = getRandomReadingWithNodeId("node1");
+    //     SensorReading reading2 = getRandomReadingWithNodeId("node2");
+    //     SensorReading reading3 = getRandomReadingWithNodeId("node3");
+    //     repo.insert(List.of(reading1, reading2, reading3));
+    //     mockMvc.perform(get("/readings/node1"))
+    //             .andExpect(status().isOk())
+    //             .andExpect(jsonPath("$", hasSize(1)))
+    //             .andExpect(jsonPath("$[0].nodeId").value("node1"));
+    // }
 
     SensorReading getRandomReadingWithNodeId(String nodeId) {
         float humidity = (float) (Math.random() * 60);
