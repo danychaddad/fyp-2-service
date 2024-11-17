@@ -4,10 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/readings")
 @Slf4j
 public class SensorReadingController {
     private final SensorReadingRepository repo;
@@ -16,20 +16,27 @@ public class SensorReadingController {
         this.repo = repo;
     }
 
-    @GetMapping
+    @GetMapping("/readings")
     public List<SensorReading> all() {
         log.info("Fetching readings from the database");
         return repo.findAll();
     }
 
-    @PostMapping
-    public SensorReading newReading(@RequestBody SensorReading newReading) {
-        SensorReading inserted = repo.insert(newReading);
+    @PostMapping("/nodes/{nodeId}/readings")
+    public SensorReading newReading(@PathVariable("nodeId") String nodeId, @RequestBody SensorReading newReading) {
+        SensorReading readingWithTimestamp = SensorReading.builder()
+                .nodeId(nodeId)
+                .temperature(newReading.getTemperature())
+                .humidity(newReading.getHumidity())
+                .gasSensorReading(newReading.getGasSensorReading())
+                .timestamp(new Date())
+                .build();
+        SensorReading inserted = repo.insert(readingWithTimestamp);
         log.info("Inserting new sensor reading in the database: {}", inserted);
         return inserted;
     }
 
-    @GetMapping("/{nodeId}")
+    @GetMapping("/nodes/{nodeId}/readings")
     public ResponseEntity<List<SensorReading>> getReadingsByNodeId(@PathVariable("nodeId") String nodeId) {
         return ResponseEntity.ok(repo.findSensorReadingsByNodeId(nodeId));
     }
