@@ -16,7 +16,6 @@ public class NodeController {
     private final NodeRepository nodeRepository;
 
     public NodeController(NodeRepository nodeRepository) {
-    public NodeController(NodeRepository nodeRepository) {
         this.nodeRepository = nodeRepository;
     }
 
@@ -66,10 +65,7 @@ public class NodeController {
                 .forestId(req.getForestId())
                 .build();
 
-
         nodeRepository.save(newNode);
-
-        updateNeighbors(newNode);
 
         updateNeighbors(newNode);
 
@@ -113,4 +109,3 @@ public class NodeController {
         return EARTH_RADIUS * c;
     }
 }
-
