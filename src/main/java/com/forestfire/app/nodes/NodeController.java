@@ -19,6 +19,33 @@ public class NodeController {
         this.nodeRepository = nodeRepository;
     }
 
+    @GetMapping("/nodes")
+    public List<Node> all() {
+        return nodeRepository.findAll();
+    }
+
+    @GetMapping("/nodes/{nodeId}")
+    public ResponseEntity<Node> getSensorById(@PathVariable("nodeId") String nodeId) {
+        Optional<Node> node = nodeRepository.findById(nodeId);
+        return node.map(value -> ResponseEntity.status(HttpStatus.OK).body(value))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @GetMapping("/forests/{forestId}/nodes")
+    public ResponseEntity<List<Node>> getNodesByForestId(@PathVariable("forestId") String forestId) {
+        List<Node> nodes = nodeRepository.findByForestId(forestId);
+        if (nodes.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(nodes);
+    }
+
+    @DeleteMapping("/nodes/{id}")
+    public ResponseEntity<String> deleteNode(@PathVariable String id) {
+        nodeRepository.deleteById(id);
+        return ResponseEntity.status(HttpStatus.OK).body("Deleted node with id: " + id);
+    }
+
     @PostMapping("/nodes/hello")
     public ResponseEntity<Node> hello(@RequestBody NodeHelloRequest req) {
         Optional<Node> existingNode = nodeRepository.findById(req.getMacAddress());
@@ -50,8 +77,8 @@ public class NodeController {
 
         for (Node node : forestNodes) {
             if (!node.getMacAddress().equals(newNode.getMacAddress())) {
-                double distance = calculateDistance(newNode.getLatitude(), newNode.getLongitude(), 
-                                                    node.getLatitude(), node.getLongitude());
+                double distance = calculateDistance(newNode.getLatitude(), newNode.getLongitude(),
+                        node.getLatitude(), node.getLongitude());
                 if (distance <= 500) {
                     addNeighbor(node, newNode);
                     addNeighbor(newNode, node);
@@ -74,8 +101,8 @@ public class NodeController {
         double dLon = Math.toRadians(lon2 - lon1);
 
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                   Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
