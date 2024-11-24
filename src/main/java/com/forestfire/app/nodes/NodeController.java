@@ -1,17 +1,25 @@
 package com.forestfire.app.nodes;
 
 import com.forestfire.app.nodes.requests.NodeHelloRequest;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
 public class NodeController {
+    private static final double EARTH_RADIUS = 6371000;
+    private static final double MAX_DISTANCE = 1000;
+    private static final int MAX_NEIGHBORS = 3;
 
     private final NodeRepository nodeRepository;
 
@@ -63,49 +71,62 @@ public class NodeController {
                 .latitude(req.getLatitude())
                 .longitude(req.getLongitude())
                 .forestId(req.getForestId())
+                .neighbors(new ArrayList<>())
                 .build();
 
         nodeRepository.save(newNode);
 
         updateNeighbors(newNode);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(newNode);
+        Node updatedNode = nodeRepository.findById(newNode.getMacAddress())
+                .orElseThrow(() -> new RuntimeException("Failed to retrieve newly created node"));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(updatedNode);
     }
 
     private void updateNeighbors(Node newNode) {
         List<Node> forestNodes = nodeRepository.findByForestId(newNode.getForestId());
+        Map<String, Map<String, Double>> distanceMap = new HashMap<>();
 
-        for (Node node : forestNodes) {
-            if (!node.getMacAddress().equals(newNode.getMacAddress())) {
-                double distance = calculateDistance(newNode.getLatitude(), newNode.getLongitude(),
-                        node.getLatitude(), node.getLongitude());
-                if (distance <= 500) {
-                    addNeighbor(node, newNode);
-                    addNeighbor(newNode, node);
+        for (Node node1 : forestNodes) {
+            Map<String, Double> nodeDistances = new HashMap<>();
+            distanceMap.put(node1.getMacAddress(), nodeDistances);
+            for (Node node2 : forestNodes) {
+                if (!node1.getMacAddress().equals(node2.getMacAddress())) {
+                    double distance = calculateDistance(
+                            node1.getLatitude(), node1.getLongitude(),
+                            node2.getLatitude(), node2.getLongitude());
+                    if (distance <= MAX_DISTANCE) {
+                        nodeDistances.put(node2.getMacAddress(), distance);
+                    }
                 }
             }
         }
-    }
 
-    private void addNeighbor(Node node, Node neighbor) {
-        if (node.getNeighbors().size() < 3 && !node.getNeighbors().contains(neighbor.getMacAddress())) {
-            node.getNeighbors().add(neighbor.getMacAddress());
+        for (Node node : forestNodes) {
+            Map<String, Double> nodeDistances = distanceMap.get(node.getMacAddress());
+            List<Map.Entry<String, Double>> sortedNeighbors = nodeDistances.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .limit(MAX_NEIGHBORS)
+                    .collect(Collectors.toList());
+
+            List<String> newNeighbors = sortedNeighbors.stream()
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+            node.setNeighbors(newNeighbors);
             nodeRepository.save(node);
+            log.info("Updated neighbors for node {}: {}", node.getMacAddress(), newNeighbors);
         }
     }
 
     private double calculateDistance(float lat1, float lon1, float lat2, float lon2) {
-        final int EARTH_RADIUS = 6371000;
-
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                        * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
         return EARTH_RADIUS * c;
     }
 }
