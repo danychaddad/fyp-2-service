@@ -1,4 +1,4 @@
-package com.forestfire.app.camera_readings;
+package com.forestfire.app.cameraReadings;
 
 import java.util.Date;
 import java.util.List;
@@ -39,7 +39,7 @@ public class CameraReadingController {
         CameraReading readingWithTimestamp = CameraReading.builder()
                 .nodeId(nodeId)
                 .image(newReading.getImage())
-                .timestamp(new Date())
+                .timestamp(newReading.getTimestamp())
                 .build();
         
         CameraReading inserted = repo.insert(readingWithTimestamp);
