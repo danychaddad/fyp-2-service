@@ -1,6 +1,5 @@
 package com.forestfire.app.cameraReadings;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
