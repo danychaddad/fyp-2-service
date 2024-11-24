@@ -1,4 +1,4 @@
-package com.forestfire.app.camera_readings;
+package com.forestfire.app.cameraReadings;
 
 import java.util.Date;
 

@@ -29,7 +29,7 @@ public class SensorReadingController {
                 .temperature(newReading.getTemperature())
                 .humidity(newReading.getHumidity())
                 .gasSensorReading(newReading.getGasSensorReading())
-                .timestamp(new Date())
+                .timestamp(newReading.getTimestamp())
                 .build();
         SensorReading inserted = repo.insert(readingWithTimestamp);
         log.info("Inserting new sensor reading in the database: {}", inserted);
