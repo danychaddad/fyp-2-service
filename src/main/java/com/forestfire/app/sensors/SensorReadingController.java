@@ -1,16 +1,22 @@
 package com.forestfire.app.sensors;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import com.forestfire.app.FireMonitoringService;
+
 import java.util.List;
 
 @RestController
 @Slf4j
 public class SensorReadingController {
     private final SensorReadingRepository repo;
+
+    @Autowired
+    private FireMonitoringService fireMonitoringService;
 
     public SensorReadingController(SensorReadingRepository repo) {
         this.repo = repo;
@@ -23,7 +29,8 @@ public class SensorReadingController {
     }
 
     @PostMapping("/nodes/{nodeId}/readings")
-    public SensorReading newReading(@PathVariable("nodeId") String nodeId, @RequestBody SensorReading newReading) {
+    public SensorReading newReading(@PathVariable("nodeId") String nodeId,
+            @RequestBody SensorReading newReading) {
         SensorReading readingWithTimestamp = SensorReading.builder()
                 .nodeId(nodeId)
                 .temperature(newReading.getTemperature())
@@ -31,8 +38,12 @@ public class SensorReadingController {
                 .gasSensorReading(newReading.getGasSensorReading())
                 .timestamp(newReading.getTimestamp())
                 .build();
+
         SensorReading inserted = repo.insert(readingWithTimestamp);
         log.info("Inserting new sensor reading in the database: {}", inserted);
+
+        fireMonitoringService.updateNodeDangerLevel(nodeId, inserted);
+
         return inserted;
     }
 
