@@ -42,9 +42,33 @@ public class SensorReadingController {
         SensorReading inserted = repo.insert(readingWithTimestamp);
         log.info("Inserting new sensor reading in the database: {}", inserted);
 
-        fireMonitoringService.updateNodeDangerLevel(nodeId, inserted);
+        int dangerLevel = fireMonitoringService.updateNodeDangerLevel(nodeId, inserted);
 
-        return inserted;
+        int refreshRate;
+        switch (dangerLevel) {
+            case 0:
+                refreshRate = 60000; // 1 minute
+                break;
+            case 1:
+                refreshRate = 30000; // 30 seconds
+                break;
+            case 2:
+                refreshRate = 10000; // 10 seconds
+                break;
+            default:
+                refreshRate = 60000; // Default to 1 minute
+        }
+
+        SensorReading insertedWithRefreshRate = SensorReading.builder()
+                .nodeId(inserted.getNodeId())
+                .temperature(inserted.getTemperature())
+                .humidity(inserted.getHumidity())
+                .gasSensorReading(inserted.getGasSensorReading())
+                .timestamp(inserted.getTimestamp())
+                .refreshRate(refreshRate)
+                .build();
+
+        return insertedWithRefreshRate;
     }
 
     @GetMapping("/nodes/{nodeId}/readings")

@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FireMonitoringService {
     private static final float TEMPERATURE_THRESHOLD = 50.0f;  // Celsius
-    private static final float GAS_THRESHOLD = 100.0f;         // Arbitrary units
+    private static final float GAS_THRESHOLD = 50.0f;          // Arbitrary units
     private static final long OFFLINE_THRESHOLD = 300000;      // 5 minutes in milliseconds
 
     @Autowired
@@ -28,7 +28,7 @@ public class FireMonitoringService {
                reading.getGasSensorReading() > GAS_THRESHOLD;
     }
 
-    public void updateNodeDangerLevel(String nodeId, SensorReading reading) {
+    public int updateNodeDangerLevel(String nodeId, SensorReading reading) {
         Node node = nodeRepository.findById(nodeId)
                 .orElseThrow(() -> new RuntimeException("Node not found: " + nodeId));
         
@@ -76,6 +76,8 @@ public class FireMonitoringService {
         // Always update last reading timestamp
         node.setLastReading(reading.getTimestamp());
         nodeRepository.save(node);
+        
+        return newDangerLevel;
     }
 
     private boolean areAllNeighborsAtLevel(List<Node> neighbors, int level) {
