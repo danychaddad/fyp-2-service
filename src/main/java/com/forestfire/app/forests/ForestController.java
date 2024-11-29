@@ -50,7 +50,7 @@ public class ForestController {
     public ResponseEntity<Forest> addForest(@RequestBody Forest forest) {
         log.info("Adding forest with name: {} to the list", forest.getName());
         forestRepository.save(forest);
-        populateForestWithNodes(forest, 50);
+        populateForestWithNodes(forest, 0.000635f);
         return ResponseEntity.status(HttpStatus.CREATED).body(forest);
     }
 
