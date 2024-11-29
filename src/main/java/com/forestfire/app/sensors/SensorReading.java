@@ -17,15 +17,13 @@ public class SensorReading {
     private final float humidity;
     private final float gasSensorReading;
     private final Date timestamp;
-    private int refreshRate;
 
     @Builder
-    public SensorReading(String nodeId, float temperature, float humidity, float gasSensorReading, Date timestamp, int refreshRate) {
+    public SensorReading(String nodeId, float temperature, float humidity, float gasSensorReading, Date timestamp) {
         this.nodeId = nodeId;
         this.temperature = temperature;
         this.humidity = humidity;
         this.gasSensorReading = gasSensorReading;
         this.timestamp = timestamp;
-        this.refreshRate = refreshRate;
     }
 }

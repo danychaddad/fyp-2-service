@@ -29,7 +29,7 @@ public class SensorReadingController {
     }
 
     @PostMapping("/nodes/{nodeId}/readings")
-    public SensorReading newReading(@PathVariable("nodeId") String nodeId,
+    public int newReading(@PathVariable("nodeId") String nodeId,
             @RequestBody SensorReading newReading) {
         SensorReading readingWithTimestamp = SensorReading.builder()
                 .nodeId(nodeId)
@@ -59,16 +59,7 @@ public class SensorReadingController {
                 refreshRate = 60000; // Default to 1 minute
         }
 
-        SensorReading insertedWithRefreshRate = SensorReading.builder()
-                .nodeId(inserted.getNodeId())
-                .temperature(inserted.getTemperature())
-                .humidity(inserted.getHumidity())
-                .gasSensorReading(inserted.getGasSensorReading())
-                .timestamp(inserted.getTimestamp())
-                .refreshRate(refreshRate)
-                .build();
-
-        return insertedWithRefreshRate;
+        return refreshRate;
     }
 
     @GetMapping("/nodes/{nodeId}/readings")
