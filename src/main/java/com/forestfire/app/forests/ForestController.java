@@ -57,13 +57,14 @@ public class ForestController {
     private void populateForestWithNodes(Forest forest, double minDistance) {
         if (forest.getVerticesOfForest().isEmpty())
             return;
+        int i = 0;
         List<Point2D.Double> points = distributePoints(forest.getVerticesOfForest(), minDistance);
         for (Point2D.Double point : points) {
             Node n = Node.builder()
                     .latitude((float) point.y)
                     .longitude((float) point.x)
                     .forestId(forest.getId())
-                    .macAddress("mac")
+                    .macAddress(forest.getId() + "mac" + i++)
                     .build();
             nodeRepository.save(n);
         }
