@@ -83,7 +83,7 @@ public class ForestController {
         }
     }
 
-    public static List<Point2D.Double> distributePoints(List<Vertex> forestVertices, double minDistance) {
+    public static List<Point2D.Double> distributePoints(List<Vertex> forestVertices, double maxDistance) {
         List<Point2D.Double> points = new ArrayList<>();
 
         // Get bounding box
@@ -105,24 +105,19 @@ public class ForestController {
         }
         polygon.closePath();
 
-        // Distribute points in a hexagonal pattern
-        for (double longitude = minLongitude; longitude <= maxLongitude; longitude += minDistance) {
-            for (double latitude = minLatitude; latitude <= maxLatitude; latitude += minDistance * Math.sqrt(3) / 2) {
-                // Offset every second column to create a hexagonal pattern
-                double offsetLongitude = (int)((latitude - minLatitude) / (minDistance * Math.sqrt(3) / 2)) % 2 == 0
-                        ? longitude
-                        : longitude + minDistance / 2;
+        // Iterate over the bounding box area, spaced by maxDistance
+        for (double x = minLongitude; x <= maxLongitude; x += maxDistance) {
+            for (double y = minLatitude; y <= maxLatitude; y += maxDistance * Math.sqrt(3) / 2) { // Hexagonal row spacing
+                // Offset every alternate row
+                double offsetX = (int)((y - minLatitude) / (maxDistance * Math.sqrt(3) / 2)) % 2 == 0 ? 0 : maxDistance / 2;
+                Point2D.Double candidatePoint = new Point2D.Double(x + offsetX, y);
 
-                Point2D.Double candidatePoint = new Point2D.Double(offsetLongitude, latitude);
-
+                // Add the point if it's inside the polygon
                 if (polygon.contains(candidatePoint)) {
-                    if (isFarEnough(points, candidatePoint, minDistance)) {
-                        points.add(candidatePoint);
-                    }
+                    points.add(candidatePoint);
                 }
             }
         }
-
 
         return points;
     }
