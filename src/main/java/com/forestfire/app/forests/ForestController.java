@@ -7,7 +7,10 @@ import java.util.List;
 
 import com.forestfire.app.forests.vertex.Vertex;
 import com.forestfire.app.nodes.Node;
+import com.forestfire.app.nodes.NodeController;
 import com.forestfire.app.nodes.NodeRepository;
+import com.forestfire.app.nodes.requests.NodeHelloRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,10 +33,13 @@ public class ForestController {
 
     private final ForestRepository forestRepository;
     private final NodeRepository nodeRepository;
+    @Autowired
+    private final NodeController nodeController;
 
-    public ForestController(ForestRepository forestRepository, NodeRepository nodeRepository) {
+    public ForestController(ForestRepository forestRepository, NodeRepository nodeRepository, NodeController nodeController) {
         this.forestRepository = forestRepository;
         this.nodeRepository = nodeRepository;
+        this.nodeController = nodeController;
     }
 
     @GetMapping
@@ -62,13 +68,12 @@ public class ForestController {
         for (Point2D.Double point : points) {
             if (i > 500)
                 break;
-            Node n = Node.builder()
+            NodeHelloRequest helloRequest = NodeHelloRequest.builder()
                     .latitude((float) point.y)
                     .longitude((float) point.x)
                     .forestId(forest.getId())
-                    .macAddress(forest.getId() + "mac" + i++)
-                    .build();
-            nodeRepository.save(n);
+                    .macAddress(forest.getId() + "mac" + i++).build();
+            nodeController.hello(helloRequest);
         }
     }
 
