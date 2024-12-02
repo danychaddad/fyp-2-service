@@ -105,10 +105,15 @@ public class ForestController {
         }
         polygon.closePath();
 
-        // Distribute points
+        // Distribute points in a hexagonal pattern
         for (double longitude = minLongitude; longitude <= maxLongitude; longitude += minDistance) {
-            for (double latitude = minLatitude; latitude <= maxLatitude; latitude += minDistance) {
-                Point2D.Double candidatePoint = new Point2D.Double(longitude, latitude);
+            for (double latitude = minLatitude; latitude <= maxLatitude; latitude += minDistance * Math.sqrt(3) / 2) {
+                // Offset every second column to create a hexagonal pattern
+                double offsetLongitude = (int)((latitude - minLatitude) / (minDistance * Math.sqrt(3) / 2)) % 2 == 0
+                        ? longitude
+                        : longitude + minDistance / 2;
+
+                Point2D.Double candidatePoint = new Point2D.Double(offsetLongitude, latitude);
 
                 if (polygon.contains(candidatePoint)) {
                     if (isFarEnough(points, candidatePoint, minDistance)) {
@@ -117,6 +122,7 @@ public class ForestController {
                 }
             }
         }
+
 
         return points;
     }
