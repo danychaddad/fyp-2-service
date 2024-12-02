@@ -131,6 +131,7 @@ public class ForestController {
     public ResponseEntity<String> deleteForest(@PathVariable String id) {
         log.info("Deleting forest with id: {}", id);
         forestRepository.deleteById(id);
+        nodeRepository.deleteByForestId(id);
         return ResponseEntity.status(HttpStatus.OK).body("Deleted forest with id: " + id);
     }
 }
