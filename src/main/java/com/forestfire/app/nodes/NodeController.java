@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class NodeController {
     private static final double EARTH_RADIUS = 6371000;
     private static final double MAX_DISTANCE = 1000;
-    private static final int MAX_NEIGHBORS = 3;
+    private static final int MAX_NEIGHBORS = 6;
 
     private final NodeRepository nodeRepository;
 
