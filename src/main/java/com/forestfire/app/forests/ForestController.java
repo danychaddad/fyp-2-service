@@ -60,6 +60,8 @@ public class ForestController {
         int i = 0;
         List<Point2D.Double> points = distributePoints(forest.getVerticesOfForest(), minDistance);
         for (Point2D.Double point : points) {
+            if (i > 500)
+                break;
             Node n = Node.builder()
                     .latitude((float) point.y)
                     .longitude((float) point.x)
