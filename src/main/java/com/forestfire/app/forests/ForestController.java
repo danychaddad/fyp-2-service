@@ -4,12 +4,12 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.forestfire.app.forests.vertex.Vertex;
 import com.forestfire.app.nodes.Node;
 import com.forestfire.app.nodes.NodeController;
 import com.forestfire.app.nodes.NodeRepository;
-import com.forestfire.app.nodes.requests.NodeHelloRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +57,12 @@ public class ForestController {
         log.info("Adding forest with name: {} to the list", forest.getName());
         forestRepository.save(forest);
         populateForestWithNodes(forest, 0.002f);
+        updateNoteNeighbors(forest);
         return ResponseEntity.status(HttpStatus.CREATED).body(forest);
+    }
+
+    private void updateNoteNeighbors(Forest forest) {
+        Objects.requireNonNull(nodeController.getNodesByForestId(forest.getId()).getBody()).forEach(nodeController::updateNeighbors);
     }
 
     private void populateForestWithNodes(Forest forest, double minDistance) {
@@ -68,12 +73,13 @@ public class ForestController {
         for (Point2D.Double point : points) {
             if (i > 500)
                 break;
-            NodeHelloRequest helloRequest = NodeHelloRequest.builder()
+            Node n = Node.builder()
                     .latitude((float) point.y)
                     .longitude((float) point.x)
                     .forestId(forest.getId())
-                    .macAddress(forest.getId() + "mac" + i++).build();
-            nodeController.hello(helloRequest);
+                    .macAddress(forest.getId() + "mac" + i++)
+                    .build();
+            nodeRepository.save(n);
         }
     }
 

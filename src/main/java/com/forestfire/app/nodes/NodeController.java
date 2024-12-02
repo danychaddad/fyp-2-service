@@ -84,7 +84,7 @@ public class NodeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedNode);
     }
 
-    protected void updateNeighbors(Node newNode) {
+    public void updateNeighbors(Node newNode) {
         List<Node> forestNodes = nodeRepository.findByForestId(newNode.getForestId());
         Map<String, Map<String, Double>> distanceMap = new HashMap<>();
 
