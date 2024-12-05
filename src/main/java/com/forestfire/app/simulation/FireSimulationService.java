@@ -29,11 +29,17 @@ public class FireSimulationService {
             log.warn("No nodes found in forest with ID: {}", forestId);
             return;
         }
+        // Reset danger level for all nodes in the forest
+        nodes.forEach(node -> {
+            node.setDangerLevel(0);
+            nodeRepository.save(node); // Persist changes
+        });
+        log.info("Reset danger levels for all nodes in forest {}", forestId);
         Node randomNode = nodes.get(new Random().nextInt(nodes.size()));
         log.info("Simulating fire in forest {} at node {}", forestId, randomNode.getMacAddress());
         simulateReading(randomNode, 80.0f, 70.0f, 90.0f, 1);
         try {
-            Thread.sleep(20000);
+            Thread.sleep(10000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -197,8 +203,6 @@ public class FireSimulationService {
         log.info("Resetting all nodes in forest {} to send good readings", forestId);
         nodes.forEach(node -> {
             simulateReading(node, 20.0f, 15.0f, 10.0f, 0); // Good readings
-            node.setDangerLevel(0);
-            nodeRepository.save(node); // Persist changes
         });
     }
 
