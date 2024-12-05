@@ -21,8 +21,9 @@ public class Forest {
 
     @Builder.Default
     private List<Vertex> verticesOfForest = new ArrayList<>();
+    @Builder.Default
 
-    private ForestFormulaParams formulaParams;
+    private ForestFormulaParams formulaParams = new ForestFormulaParams();
 
     public boolean addVertex(Vertex vertex) {
         return verticesOfForest.add(vertex);
@@ -43,6 +44,8 @@ public class Forest {
     }
 
     public float getNodeDistance() {
+        if (formulaParams == null)
+            return 250f;
         return -2.078f
                 + 0.045f * formulaParams.getX1()
                 + 0.181f * formulaParams.getX2()
