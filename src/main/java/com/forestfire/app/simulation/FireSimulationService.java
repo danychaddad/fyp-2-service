@@ -201,9 +201,17 @@ public class FireSimulationService {
 
         // After the fire stops, reset all nodes to send good readings
         log.info("Resetting all nodes in forest {} to send good readings", forestId);
-        nodes.forEach(node -> {
-            simulateReading(node, 20.0f, 15.0f, 10.0f, 0); // Good readings
-        });
+        long endTime = System.currentTimeMillis() + 60000; // 1 minute from now
+        while (System.currentTimeMillis() < endTime) {
+            nodes.forEach(node -> {
+                simulateReading(node, 20.0f, 15.0f, 10.0f, 0); // Good readings
+            });
+            try {
+                Thread.sleep(2000); // Wait 2 seconds between each cycle of readings
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     /**
