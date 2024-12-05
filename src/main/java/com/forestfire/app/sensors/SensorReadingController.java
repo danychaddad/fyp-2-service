@@ -36,6 +36,7 @@ public class SensorReadingController {
                 .temperature(newReading.getTemperature())
                 .humidity(newReading.getHumidity())
                 .gasSensorReading(newReading.getGasSensorReading())
+                .cameraReading(newReading.getCameraReading())
                 .timestamp(newReading.getTimestamp())
                 .build();
 
