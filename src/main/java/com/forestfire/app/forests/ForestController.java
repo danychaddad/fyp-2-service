@@ -56,9 +56,14 @@ public class ForestController {
     public ResponseEntity<Forest> addForest(@RequestBody Forest forest) {
         log.info("Adding forest with name: {} to the list", forest.getName());
         forestRepository.save(forest);
-        populateForestWithNodes(forest, 0.002f);
+        float distanceInMeters = Math.min(forest.getNodeDistance(), 250f);
+        populateForestWithNodes(forest, getDistanceInDegreesFrom(distanceInMeters));
         updateNoteNeighbors(forest);
         return ResponseEntity.status(HttpStatus.CREATED).body(forest);
+    }
+
+    private double getDistanceInDegreesFrom(float distanceInMeters) {
+        return distanceInMeters / 111111f;
     }
 
     private void updateNoteNeighbors(Forest forest) {
@@ -109,7 +114,7 @@ public class ForestController {
         for (double x = minLongitude; x <= maxLongitude; x += maxDistance) {
             for (double y = minLatitude; y <= maxLatitude; y += maxDistance * Math.sqrt(3) / 2) { // Hexagonal row spacing
                 // Offset every alternate row
-                double offsetX = (int)((y - minLatitude) / (maxDistance * Math.sqrt(3) / 2)) % 2 == 0 ? 0 : maxDistance / 2;
+                double offsetX = (int) ((y - minLatitude) / (maxDistance * Math.sqrt(3) / 2)) % 2 == 0 ? 0 : maxDistance / 2;
                 Point2D.Double candidatePoint = new Point2D.Double(x + offsetX, y);
 
                 // Add the point if it's inside the polygon

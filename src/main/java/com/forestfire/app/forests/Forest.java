@@ -16,16 +16,19 @@ import lombok.Data;
 @Document("forests")
 public class Forest {
     @Id
-    private String id;    
+    private String id;
     private String name;
 
     @Builder.Default
     private List<Vertex> verticesOfForest = new ArrayList<>();
+    @Builder.Default
+
+    private ForestFormulaParams formulaParams = new ForestFormulaParams();
 
     public boolean addVertex(Vertex vertex) {
         return verticesOfForest.add(vertex);
-    }   
-    
+    }
+
     public boolean updateVertex(Vertex vertex) {
         for (int i = 0; i < verticesOfForest.size(); i++) {
             if (verticesOfForest.get(i).getId().equals(vertex.getId())) {
@@ -35,8 +38,24 @@ public class Forest {
         }
         return false;
     }
-    
+
     public boolean removeVertex(Vertex vertex) {
         return verticesOfForest.removeIf(v -> v.getId().equals(vertex.getId()));
+    }
+
+    public float getNodeDistance() {
+        if (formulaParams == null)
+            return 250f;
+        return -2.078f
+                + 0.045f * formulaParams.getX1()
+                + 0.181f * formulaParams.getX2()
+                + 0.347f * formulaParams.getX3()
+                + 0.04f * formulaParams.getX4()
+                + 0.014f * formulaParams.getX5()
+                + 0.094f * formulaParams.getX6()
+                + 0.03f * formulaParams.getX7()
+                + 0.042f * formulaParams.getX8()
+                + 0.202f * formulaParams.getX9()
+                + 0.004f * formulaParams.getX10();
     }
 }
